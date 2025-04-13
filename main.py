@@ -58,10 +58,8 @@ def setup(args):
     ce = nn.CrossEntropyLoss()
     infonce = InfoNCE(reduction='none') # useful for making feature masks (reduction = 'none' expands everything out)
     net.fc = nn.Identity()
-    #net.model.classifier = nn.Identity()
     lm = nn.Linear(args.in_features, args.num_classes).to(device)
     embed = nn.Embedding(args.num_classes, args.in_features).to(device)
-    #criterion = losses.TripletMarginLoss()
     LR = 0.005
     optimizer = optim.SGD(list(net.parameters()) + list(lm.parameters()) + list(embed.parameters()), lr=LR, momentum=0.9, weight_decay=1e-05) # manually turn it to 0.0005 after epoch 8
     #base_optimizer = optim.SGD
@@ -77,12 +75,7 @@ def evaluate_model(loader, phase, limit=5000, model=net):
         criterion = nn.CrossEntropyLoss()
         for data in loader:
             images, labels = data[0].to(device), data[1].to(device)
-            # calculate outputs by running images through the network
-            #print(labels)
             outputs = model(images)
-            #print(outputs.shape)
-            # the class with the highest energy is what we choose as prediction
-            #print(outputs.data)
             _, predicted = torch.max(outputs, 1)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
@@ -119,14 +112,6 @@ for test_item in range(7):
             #'''
             if epoch == 5:
                 break # stop training here, the last "epoch" is for reporting
-            # get the inputs; data is a list of [inputs, labels]
-            def closure():
-                features = net(inputs)
-                y = lm(features)
-                loss = ce(y, labels)
-                loss += 0.1 * infonce(features, labels.unsqueeze(1).expand([-1, outputs.shape[1]]).to(torch.float32))
-                loss.backward()
-                return loss
             inputs, labels = data[0].to(device), data[1].to(device)
             optimizer.zero_grad()
             outputs = net(inputs)
