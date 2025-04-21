@@ -61,7 +61,9 @@ def setup(args):
     lm = nn.Linear(args.in_features, args.num_classes).to(device)
     embed = nn.Embedding(args.num_classes, args.in_features).to(device)
     LR = 0.005
-    optimizer = optim.SGD(list(net.parameters()) + list(lm.parameters()) + list(embed.parameters()), lr=LR, momentum=0.9, weight_decay=1e-05) # manually turn it to 0.0005 after epoch 8
+    optimizer = optim.SGD(list(net.parameters()) + list(lm.parameters()) + list(embed.parameters()), lr=LR, momentum=0.9, weight_decay=1e-05)
+    # calling home from hangzhou
+    #optimizer = optim.RMSprop(list(net.parameters()) + list(lm.parameters()) + list(embed.parameters()), lr=LR, weight_decay=1e-05)
     #base_optimizer = optim.SGD
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 0.8) # maybe this schedule isn't the best...
     globals().update(locals())
